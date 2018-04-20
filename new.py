@@ -59,11 +59,9 @@ def extract_data(filename, num):
     #unzip data
     with gzip.open(filename) as bytestream:
         bytestream.read(16)
-        buf = bytestream.read(28 * 28 * num * 1)
+        buf = bytestream.read(28 * 28 * num)
         data = np.frombuffer(buf, dtype=np.uint8).astype(np.float32)
-        data = (data - (255 / 2.0)) / 255 #rescaling value to [-0.5,0.5]
-        data = data.reshape(num, 28, 28, 1) #reshape into tensor
-        data = np.reshape(data, [num, -1])
+        data = data.reshape(num, 28, 28) #reshape into tensor
     return data
 
 '''
@@ -78,13 +76,10 @@ def extract_labels(filename, num):
     print('Extracting', filename)
     with gzip.open(filename) as bytestream:
         bytestream.read(8)
-        buf = bytestream.read(1 * num)
+        buf = bytestream.read(num)
         labels = np.frombuffer(buf, dtype=np.uint8).astype(np.int64)
-        num_labels_data = len(labels)
-        one_hot_encoding = np.zeros((num_labels_data,10))
-        one_hot_encoding[np.arange(num_labels_data),labels] = 1
-        one_hot_encoding = np.reshape(one_hot_encoding, [-1, 10])
-    return one_hot_encoding
+
+    return labels
 
 '''
 Augment training data with rotated digits
@@ -103,7 +98,7 @@ def expand_training_data(images, labels):
         k = k+1
         if k%100==0:
             print ('expanding data : %03d / %03d' % (k,np.size(images,0)))
-
+        print(x.shape)
         # register original data
         expanded_images.append(x)
         expanded_labels.append(y)
@@ -111,6 +106,8 @@ def expand_training_data(images, labels):
         bg_value = -0.5 # this is regarded as background's value black
 
         image = np.reshape(x, (-1, 28))
+        print(image.shape)
+        #time.sleep(2)
         for i in range(4):
             # rotate the image with random degree
             angle = np.random.randint(-90,90,1)
@@ -134,16 +131,16 @@ def expand_training_data(images, labels):
             '''
             # register new training data
 
-            expanded_images.append(np.reshape(new_img_, 784))
+            expanded_images.append(new_img_)
             expanded_labels.append(y)
 
 
     # images and labels are concatenated for random-shuffle at each epoch
     # notice that pair of image and label should not be broken
-    expanded_train_total_data = np.concatenate((expanded_images, expanded_labels), axis=1)
-    np.random.shuffle(expanded_train_total_data)
 
-    return expanded_train_total_data
+    expandedX=np.asarray(expanded_images)
+    expandedY=np.asarray(expanded_labels)
+    return expandedX, expandedY
 
 # Prepare MNISt data
 def prepare_MNIST_data(use_data_augmentation=True):
@@ -159,38 +156,30 @@ def prepare_MNIST_data(use_data_augmentation=True):
     test_data = extract_data(test_data_filename, 10000)
     test_labels = extract_labels(test_labels_filename, 10000)
     # Generate a validation set.
-    print(train_data.shape)
-    validation_data = train_data[:VALIDATION_SIZE, :]
-    validation_labels = train_labels[:VALIDATION_SIZE,:]
-    #train_data = train_data[VALIDATION_SIZE:, :]
-    #train_labels = train_labels[VALIDATION_SIZE:,:]
+    print(test_data.shape)
 
     # Concatenate train_data & train_labels for random shuffle
     #if use_data_augmentation:
-    #    train_total_data = expand_training_data(train_data, train_labels)
+        #train_data,train_labels = expand_training_data(train_data, train_labels)
     #else:
-    train_total_data = np.concatenate((train_data, train_labels), axis=1)
 
-    train_size = train_total_data.shape[0]
-    trainX = train_total_data[:, :-10]
-    trainY = train_total_data[:, -10:]
-    print(trainX.shape)
-    print(trainX[1])
+
+    train_data,train_labels = expand_training_data(train_data, train_labels)
     if not os.path.isdir("data/train-images"):
         os.makedirs("data/train-images")
     if not os.path.isdir("data/test-images"):
         os.makedirs("data/test-images")
     # process train data
-    with open("data/train-labels.csv", 'wb') as csvFile:
+    with open("data/train-labels.csv", 'w') as csvFile:
         writer = csv.writer(csvFile, delimiter=',', quotechar='"')
-    for i in range(trainX.shape[1]):
-        imsave("data/train-images/" + str(i) + ".jpg", trainX[i])
-    writer.writerow(["train-images/" + str(i) + ".jpg", trainY[i]])
+        for i in range(len(train_data)):
+            #imsave("data/train-images/" + str(i) + ".jpg", train_data[i][:,:,0])
+            writer.writerow(["train-images/" + str(i) + ".jpg", train_labels[i]])
     # repeat for test data
-    with open("mnist/test-labels.csv", 'wb') as csvFile:
+    with open("data/test-labels.csv", 'w') as csvFile:
         writer = csv.writer(csvFile, delimiter=',', quotechar='"')
-    for i in range(len(test_data)):
-        imsave("mnist/test-images/" + str(i) + ".jpg", test_data[i])
-        writer.writerow(["test-images/" + str(i) + ".jpg", test_labels[i]])
-    return train_total_data, train_size, validation_data, validation_labels, test_data, test_labels
-train_total_data, train_size, validation_data, validation_labels, test_data, test_labels = prepare_MNIST_data(True)
+        for i in range(len(test_data)):
+            #imsave("mnist/test-images/" + str(i) + ".jpg", test_data[i][:,:,0])
+            writer.writerow(["test-images/" + str(i) + ".jpg", test_labels[i]])
+    #return train_total_data, train_size, validation_data, validation_labels, test_data, test_labels
+prepare_MNIST_data(True)
