@@ -4,13 +4,17 @@
 ## Date: 21st April 2018
 ## Author: Chaitanya Baweja, Imperial College London
 ##################################################
+<<<<<<< HEAD
 
+=======
+>>>>>>> 5ea89f355cc8cd60a36db80aaa6f4b42adc2c144
 from __future__ import absolute_import
 from __future__ import print_function
 from __future__ import division
 
 import gzip
 import os
+<<<<<<< HEAD
 import numpy as np
 import tensorflow as tf
 
@@ -39,6 +43,33 @@ def download(filename):
     #Check if file exists, if not download
     if not tf.gfile.Exists(filepath):
         filepath, _ = urllib.request.urlretrieve(URL + filename, filepath)
+=======
+import numpy
+from scipy import ndimage
+
+from six.moves import urllib
+
+import tensorflow as tf
+
+SOURCE_URL = 'http://yann.lecun.com/exdb/mnist/'
+DATA_DIRECTORY = "data"
+
+# Params for MNIST
+IMAGE_SIZE = 28
+NUM_CHANNELS = 1
+PIXEL_DEPTH = 255
+NUM_LABELS = 10
+VALIDATION_SIZE = 5000  # Size of the validation set.
+
+# Download MNIST data
+def maybe_download(filename):
+    """Download the data from Yann's website, unless it's already here."""
+    if not tf.gfile.Exists(DATA_DIRECTORY):
+        tf.gfile.MakeDirs(DATA_DIRECTORY)
+    filepath = os.path.join(DATA_DIRECTORY, filename)
+    if not tf.gfile.Exists(filepath):
+        filepath, _ = urllib.request.urlretrieve(SOURCE_URL + filename, filepath)
+>>>>>>> 5ea89f355cc8cd60a36db80aaa6f4b42adc2c144
         with tf.gfile.GFile(filepath) as f:
             size = f.size()
         print('Successfully downloaded', filename, size, 'bytes.')
