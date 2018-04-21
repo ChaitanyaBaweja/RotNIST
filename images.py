@@ -92,6 +92,7 @@ def expand_training_data(images, labels):
         tf.gfile.MakeDirs("data/New")
     k = 0 # counter
     for x, y in zip(images, labels):
+        #print(x.shape)
         k = k+1
         if k%100==0:
             print ('expanding data : %03d / %03d' % (k,np.size(images,0)))
@@ -101,9 +102,11 @@ def expand_training_data(images, labels):
         expanded_labels.append(y)
 
         bg_value = -0.5 # this is regarded as background's value black
-
+        #print(x)
         image = np.reshape(x, (-1, 28))
-
+        #time.sleep(3)
+        #print(image)
+        #time.sleep(3)
         for i in range(4):
             # rotate the image with random degree
             angle = np.random.randint(-90,90,1)
@@ -116,13 +119,16 @@ def expand_training_data(images, labels):
             #code for saving some of these for visualization purpose only
             image1 = (image*255) + (255 / 2.0)
             new_img1 = (new_img_*255) + (255 / 2.0)
+            new_img2 = np.reshape(new_img_,(28,28,1))
+            #print(new_img1.shape)
 
             # register new training data
 
-            expanded_images.append(new_img_)
+            expanded_images.append(new_img2)
             expanded_labels.append(y)
 
     # return them as arrays
+
     expandedX=np.asarray(expanded_images)
     expandedY=np.asarray(expanded_labels)
     return expandedX, expandedY
@@ -163,4 +169,4 @@ def prepare_MNIST_data(use_data_augmentation=True):
             #imsave("mnist/test-images/" + str(i) + ".jpg", test_data[i][:,:,0])
             writer.writerow(["test-images/" + str(i) + ".jpg", test_labels[i]])
     #return train_total_data, train_size, validation_data, validation_labels, test_data, test_labels
-prepare_MNIST_data(False)
+prepare_MNIST_data(True)
