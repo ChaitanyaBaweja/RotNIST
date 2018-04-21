@@ -1,6 +1,7 @@
 ##################################################
 ## Project: RotNIST
 ## Script purpose: To download MNIST dataset and append new rotated digits to it
+##                 Stores the images as jpg files with a CSV for labels
 ## Date: 21st April 2018
 ## Author: Chaitanya Baweja, Imperial College London
 ##################################################
@@ -19,14 +20,12 @@ from scipy import ndimage
 from six.moves import urllib
 from PIL import Image
 from scipy.misc import imsave
+
 #Url for downloading MNIST dataset
 URL = 'http://yann.lecun.com/exdb/mnist/'
 #Data Directory where all data is saved
 DATA_DIRECTORY = "data"
 
-# Params for MNIST
-
-VALIDATION_SIZE = 5000  # Size of the validation set.
 
 '''
 Download the data from Yann's website, unless it's already here.
@@ -78,7 +77,6 @@ def extract_labels(filename, num):
         bytestream.read(8)
         buf = bytestream.read(num)
         labels = np.frombuffer(buf, dtype=np.uint8).astype(np.int64)
-
     return labels
 
 '''
@@ -120,15 +118,7 @@ def expand_training_data(images, labels):
             #code for saving some of these for visualization purpose only
             image1 = (image*255) + (255 / 2.0)
             new_img1 = (new_img_*255) + (255 / 2.0)
-            '''
-            if k<50:
-                NAME1 = DATA_DIRECTORY+"/New"+"/"+str(k)+"_0.jpeg"
-                im = Image.fromarray(image1)
-                im.convert('RGB').save(NAME1)
-                im = Image.fromarray(new_img1)
-                NAME = DATA_DIRECTORY+"/New"+"/"+str(k)+"_"+str(i+1)+".jpeg"
-                im.convert('RGB').save(NAME)
-            '''
+
             # register new training data
 
             expanded_images.append(new_img_)
