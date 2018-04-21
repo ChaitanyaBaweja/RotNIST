@@ -145,7 +145,9 @@ def expand_training_data(images, labels):
 
     return expanded_train_total_data
 
-# Prepare MNISt data
+'''
+Main function to prepare the entire data
+'''
 def prepare_MNIST_data(use_data_augmentation=True):
     # Get the data.
     train_data_filename = download('train-images-idx3-ubyte.gz')
@@ -162,35 +164,16 @@ def prepare_MNIST_data(use_data_augmentation=True):
     print(train_data.shape)
     validation_data = train_data[:VALIDATION_SIZE, :]
     validation_labels = train_labels[:VALIDATION_SIZE,:]
-    #train_data = train_data[VALIDATION_SIZE:, :]
-    #train_labels = train_labels[VALIDATION_SIZE:,:]
+    train_data = train_data[VALIDATION_SIZE:, :]
+    train_labels = train_labels[VALIDATION_SIZE:,:]
 
     # Concatenate train_data & train_labels for random shuffle
-    #if use_data_augmentation:
-    #    train_total_data = expand_training_data(train_data, train_labels)
-    #else:
-    train_total_data = np.concatenate((train_data, train_labels), axis=1)
+    if use_data_augmentation:
+        train_total_data = expand_training_data(train_data, train_labels)
+    else:
+        train_total_data = np.concatenate((train_data, train_labels), axis=1)
 
     train_size = train_total_data.shape[0]
-    trainX = train_total_data[:, :-10]
-    trainY = train_total_data[:, -10:]
-    print(trainX.shape)
-    print(trainX[1])
-    if not os.path.isdir("data/train-images"):
-        os.makedirs("data/train-images")
-    if not os.path.isdir("data/test-images"):
-        os.makedirs("data/test-images")
-    # process train data
-    with open("data/train-labels.csv", 'wb') as csvFile:
-        writer = csv.writer(csvFile, delimiter=',', quotechar='"')
-    for i in range(trainX.shape[1]):
-        imsave("data/train-images/" + str(i) + ".jpg", trainX[i])
-    writer.writerow(["train-images/" + str(i) + ".jpg", trainY[i]])
-    # repeat for test data
-    with open("mnist/test-labels.csv", 'wb') as csvFile:
-        writer = csv.writer(csvFile, delimiter=',', quotechar='"')
-    for i in range(len(test_data)):
-        imsave("mnist/test-images/" + str(i) + ".jpg", test_data[i])
-        writer.writerow(["test-images/" + str(i) + ".jpg", test_labels[i]])
+
     return train_total_data, train_size, validation_data, validation_labels, test_data, test_labels
 train_total_data, train_size, validation_data, validation_labels, test_data, test_labels = prepare_MNIST_data(True)

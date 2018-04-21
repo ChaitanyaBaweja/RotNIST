@@ -1,7 +1,7 @@
 ##################################################
 ## Project: RotNIST
 ## Script purpose: To download MNIST dataset and append new rotated digits to it
-##                 Stores the images as jpg files with a CSV for labels
+## tores the images as jpg files with a CSV for labels
 ## Date: 21st April 2018
 ## Author: Chaitanya Baweja, Imperial College London
 ##################################################
@@ -140,8 +140,7 @@ def prepare_MNIST_data(use_data_augmentation=True):
     train_labels = extract_labels(train_labels_filename, 60000)
     test_data = extract_data(test_data_filename, 10000)
     test_labels = extract_labels(test_labels_filename, 10000)
-    # Generate a validation set.
-    print(test_data.shape)
+
 
     if use_data_augmentation:
         train_data,train_labels = expand_training_data(train_data, train_labels)
