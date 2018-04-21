@@ -45,8 +45,7 @@ def download(filename):
         print('Successfully downloaded', filename, size, 'bytes.')
     return filepath
 '''
-Extract images from given file path into a 4D tensor [image index, y, x, channels].
-Values are rescaled from [0, 255] down to [-0.5, 0.5].
+Extract images from given file path into a 3D tensor [image index, y, x].
 filename: filepath to images
 num: number of images
 60000 in case of training
@@ -96,7 +95,7 @@ def expand_training_data(images, labels):
         k = k+1
         if k%100==0:
             print ('expanding data : %03d / %03d' % (k,np.size(images,0)))
-        print(x.shape)
+
         # register original data
         expanded_images.append(x)
         expanded_labels.append(y)
@@ -104,8 +103,7 @@ def expand_training_data(images, labels):
         bg_value = -0.5 # this is regarded as background's value black
 
         image = np.reshape(x, (-1, 28))
-        print(image.shape)
-        #time.sleep(2)
+
         for i in range(4):
             # rotate the image with random degree
             angle = np.random.randint(-90,90,1)
@@ -124,10 +122,7 @@ def expand_training_data(images, labels):
             expanded_images.append(new_img_)
             expanded_labels.append(y)
 
-
-    # images and labels are concatenated for random-shuffle at each epoch
-    # notice that pair of image and label should not be broken
-
+    # return them as arrays
     expandedX=np.asarray(expanded_images)
     expandedY=np.asarray(expanded_labels)
     return expandedX, expandedY
@@ -148,13 +143,9 @@ def prepare_MNIST_data(use_data_augmentation=True):
     # Generate a validation set.
     print(test_data.shape)
 
-    # Concatenate train_data & train_labels for random shuffle
-    #if use_data_augmentation:
-        #train_data,train_labels = expand_training_data(train_data, train_labels)
-    #else:
+    if use_data_augmentation:
+        train_data,train_labels = expand_training_data(train_data, train_labels)
 
-
-    train_data,train_labels = expand_training_data(train_data, train_labels)
     if not os.path.isdir("data/train-images"):
         os.makedirs("data/train-images")
     if not os.path.isdir("data/test-images"):
