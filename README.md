@@ -45,9 +45,13 @@ Six is a Python 2 and 3 compatibility library. It provides utility functions for
 Run the following commands in Terminal.
 
 git clone https://github.com/ChaitanyaBaweja/RotNIST.git
+
 cd RotNIST
+
 python main.py
+
 python images.py
+
 * main.py Contains the code to save rotated images in 4D numpy arrays and return them for other codes, to be used as auxiliary file for networks
 * images.py Contains the code to save rotated images as .jpg files
 
