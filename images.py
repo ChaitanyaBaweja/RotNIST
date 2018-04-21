@@ -59,7 +59,7 @@ def extract_data(filename, num):
         bytestream.read(16)
         buf = bytestream.read(28 * 28 * num)
         data = np.frombuffer(buf, dtype=np.uint8).astype(np.float32)
-        data = data.reshape(num, 28, 28) #reshape into tensor
+        data = data.reshape(num, 28, 28,1) #reshape into tensor
     return data
 
 '''
@@ -153,7 +153,8 @@ def prepare_MNIST_data(use_data_augmentation=True):
     with open("data/train-labels.csv", 'w') as csvFile:
         writer = csv.writer(csvFile, delimiter=',', quotechar='"')
         for i in range(len(train_data)):
-            #imsave("data/train-images/" + str(i) + ".jpg", train_data[i][:,:,0])
+            if i<20:
+                imsave("data/train-images/" + str(i) + ".jpg", train_data[i][:,:,0])
             writer.writerow(["train-images/" + str(i) + ".jpg", train_labels[i]])
     # repeat for test data
     with open("data/test-labels.csv", 'w') as csvFile:
@@ -162,4 +163,4 @@ def prepare_MNIST_data(use_data_augmentation=True):
             #imsave("mnist/test-images/" + str(i) + ".jpg", test_data[i][:,:,0])
             writer.writerow(["test-images/" + str(i) + ".jpg", test_labels[i]])
     #return train_total_data, train_size, validation_data, validation_labels, test_data, test_labels
-prepare_MNIST_data(True)
+prepare_MNIST_data(False)
